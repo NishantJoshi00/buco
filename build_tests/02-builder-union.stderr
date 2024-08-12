@@ -1,0 +1,16 @@
+error: Builder can only be derived for structs
+ --> build_tests/02-builder-union.rs:3:10
+  |
+3 | #[derive(Builder)]
+  |          ^^^^^^^
+  |
+  = note: this error originates in the derive macro `Builder` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0599]: no function or associated item named `builder` found for union `Elements` in the current scope
+  --> build_tests/02-builder-union.rs:12:23
+   |
+4  | union Elements {
+   | -------------- function or associated item `builder` not found for this union
+...
+12 |     let _ = Elements::builder()
+   |                       ^^^^^^^ function or associated item not found in `Elements`

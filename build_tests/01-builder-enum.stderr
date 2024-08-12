@@ -1,0 +1,16 @@
+error: Builder can only be derived for structs
+ --> build_tests/01-builder-enum.rs:3:10
+  |
+3 | #[derive(Builder)]
+  |          ^^^^^^^
+  |
+  = note: this error originates in the derive macro `Builder` (in Nightly builds, run with -Z macro-backtrace for more info)
+
+error[E0599]: no variant or associated item named `builder` found for enum `Elements` in the current scope
+  --> build_tests/01-builder-enum.rs:12:23
+   |
+4  | enum Elements {
+   | ------------- variant or associated item `builder` not found for this enum
+...
+12 |     let _ = Elements::builder().set_fire().build();
+   |                       ^^^^^^^ variant or associated item not found in `Elements`

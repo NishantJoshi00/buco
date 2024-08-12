@@ -1,0 +1,11 @@
+[package]
+name = "buco"
+version = "0.1.0"
+edition = "2021"
+license-file = "LICENSE"
+
+[dependencies]
+buco_derive = { path = "buco_derive" }
+
+[dev-dependencies]
+trybuild = "1.0"

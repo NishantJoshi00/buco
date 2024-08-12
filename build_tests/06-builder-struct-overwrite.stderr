@@ -1,0 +1,13 @@
+error[E0599]: no method named `set_fire` found for struct `ElementsBuilder<FireField>` in the current scope
+ --> build_tests/06-builder-struct-overwrite.rs:9:45
+  |
+3 | #[derive(Builder)]
+  |          ------- method `set_fire` not found for this struct
+...
+9 |     let _ = Elements::builder().set_fire(1).set_fire(2).build();
+  |             -------------------             ^^^^^^^^ method not found in `ElementsBuilder<FireField>`
+  |             |
+  |             method `set_fire` is available on `ElementsBuilder<()>`
+  |
+  = note: the method was found for
+          - `ElementsBuilder<()>`
