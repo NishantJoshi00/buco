@@ -5,7 +5,7 @@ edition = "2021"
 license-file = "LICENSE"
 
 [dependencies]
-buco_derive = { path = "buco_derive" }
+buco_derive = { path = "buco_derive", version = "0.1.0"}
 
 [dev-dependencies]
-trybuild = "1.0"
+trybuild = "1.0.99"
