@@ -1,7 +1,12 @@
 [package]
 name = "buco_derive"
+description = "Proc-macro for [`buco`](https://github.com/NishantJoshi00/buco.git) crate"
 version = "0.2.0"
 edition = "2021"
+exclude = ["build_tests/*", "target/*"]
+repository = "https://github.com/NishantJoshi00/buco.git"
+license = "../LICENSE"
+readme = "../README.md"
 
 [lib]
 proc-macro = true

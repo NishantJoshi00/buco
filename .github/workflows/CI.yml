@@ -63,6 +63,9 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
       - name: Checkout repository
         uses: actions/checkout@v3
-      - name: Publish Dry run
+      - name: "Dry run: buco_derive"
+        run: cargo publish --dry-run
+        working-directory: buco_derive
+      - name: "Dry run: buco"
         run: cargo publish --dry-run
 
