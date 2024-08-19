@@ -4,7 +4,7 @@ use syn::{parse_macro_input, DeriveInput};
 
 mod inner;
 
-#[proc_macro_derive(Builder)]
+#[proc_macro_derive(Builder, attributes(buco))]
 pub fn derive_builder(input_stream: TokenStream) -> TokenStream {
     let input = parse_macro_input!(input_stream as DeriveInput);
 

@@ -1,17 +1,32 @@
 use std::collections::HashMap;
 
+use itertools::Itertools;
 use proc_macro2::TokenStream;
-use quote::quote;
-use syn::DeriveInput;
+use quote::{quote, ToTokens};
+use syn::{Attribute, DeriveInput, Ident};
 
 pub(super) fn derive_buidler_for_struct(input: DeriveInput) -> TokenStream {
+    let buco_attributes: Vec<&Attribute> = input
+        .attrs
+        .iter()
+        .filter(|attr| attr.path().is_ident("buco"))
+        .collect();
+
+    let mut is_strict = false;
+
+    for attr in buco_attributes {
+        let name: Ident = attr.parse_args().expect("Failed to parse attribute");
+        if name == "strict" {
+            is_strict = true;
+        }
+    }
+
     // name of the original struct
     let name = &input.ident;
 
     // ident of the builder struct
     let builder_name = format!("{}Builder", name);
     let builder_ident = syn::Ident::new(&builder_name, name.span());
-
 
     let original_struct = match input.data {
         syn::Data::Struct(data) => data,
@@ -43,6 +58,11 @@ pub(super) fn derive_buidler_for_struct(input: DeriveInput) -> TokenStream {
 
     // field types present in the original struct
     let types = original_field_pairs.values().collect::<Vec<_>>();
+
+    let optional_types = types
+        .iter()
+        .map(|ty| ty.to_token_stream().to_string().starts_with("Option"))
+        .collect::<Vec<_>>();
 
     let cap_fields = fields
         .iter()
@@ -134,6 +154,18 @@ pub(super) fn derive_buidler_for_struct(input: DeriveInput) -> TokenStream {
             }
         });
 
+    let optional_impls = if is_strict {
+        quote! {}
+    } else {
+        generate_option_impls(
+            name.clone(),
+            builder_ident.clone(),
+            builder_struct_idents.clone(),
+            fields.clone().into_iter().cloned().collect(),
+            optional_types,
+        )
+    };
+
     quote! {
         const _: () = {
             #(
@@ -161,6 +193,8 @@ pub(super) fn derive_buidler_for_struct(input: DeriveInput) -> TokenStream {
                 #builder_impls
             )*
 
+            #optional_impls
+
             impl #builder_ident<#(#builder_struct_idents,)*> {
                 #[inline]
                 fn build(self) -> #name {
@@ -172,5 +206,82 @@ pub(super) fn derive_buidler_for_struct(input: DeriveInput) -> TokenStream {
                 }
             }
         };
+    }
+}
+
+fn generate_option_impls(
+    name: Ident,
+    builder_ident: Ident,
+    builder_struct_idents: Vec<Ident>,
+    fields: Vec<Ident>,
+    optional_types: Vec<bool>,
+) -> TokenStream {
+    // here is optional types is a array of options consider it as a boolean array
+    // I wish to generate all the iterations for non-none fields
+    // e.g. if optional_types = [Some(()), None, Some(())]
+    // then I want to generate
+    // [None, None, Some(())],
+    // [Some(()), None, None],
+    // [Some(()), None, Some(())]
+
+    let possibilities = optional_types
+        .iter()
+        .enumerate()
+        .filter_map(|(i, &is_optional)| if is_optional { Some(i) } else { None })
+        .collect::<Vec<_>>();
+
+    let possibilites = (1..=possibilities.len())
+        .flat_map(|count| {
+            possibilities
+                .iter()
+                .cloned()
+                .combinations(count)
+                .collect::<Vec<_>>()
+        })
+        .collect::<Vec<_>>();
+
+    let mut build_impls = Vec::new();
+
+    for pattern in possibilites {
+        let inner_builder_struct_idents = builder_struct_idents
+            .clone()
+            .into_iter()
+            .enumerate()
+            .map(|(idx, value)| {
+                if pattern.contains(&idx) {
+                    quote! { () }
+                } else {
+                    quote! { #value }
+                }
+            });
+        let inner_fields = fields.clone().into_iter().enumerate().map(|(idx, value)| {
+            if pattern.contains(&idx) {
+                quote! { None }
+            } else {
+                quote! { self.#value.0 }
+            }
+        });
+
+        let output = quote! {
+
+            impl #builder_ident<#(#inner_builder_struct_idents,)*> {
+                #[inline]
+                fn build(self) -> #name {
+                    #name {
+                        #(
+                            #fields: #inner_fields,
+                        )*
+                    }
+                }
+            }
+        };
+
+        build_impls.push(output);
+    }
+
+    quote! {
+        #(
+            #build_impls
+        )*
     }
 }

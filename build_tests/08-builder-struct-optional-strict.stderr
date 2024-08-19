@@ -1,0 +1,11 @@
+error[E0599]: no method named `build` found for struct `ElementsBuilder<()>` in the current scope
+  --> build_tests/08-builder-struct-optional-strict.rs:11:33
+   |
+4  | #[derive(Builder)]
+   |          ------- method `build` not found for this struct
+...
+11 |     let _ = Elements::builder().build();
+   |                                 ^^^^^ method not found in `ElementsBuilder<()>`
+   |
+   = note: the method was found for
+           - `ElementsBuilder<LightField>`

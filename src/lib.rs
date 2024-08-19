@@ -62,6 +62,8 @@ mod tests {
         t.compile_fail("build_tests/04-builder-struct-partial.rs");
         t.pass("build_tests/05-builder-struct-complete.rs");
         t.compile_fail("build_tests/06-builder-struct-overwrite.rs");
+        t.pass("build_tests/07-builder-struct-optional.rs");
+        t.compile_fail("build_tests/08-builder-struct-optional-strict.rs");
     }
 
     #[test]
