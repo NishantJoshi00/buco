@@ -5,9 +5,7 @@ error[E0599]: no method named `set_fire` found for struct `ElementsBuilder<FireF
   |          ------- method `set_fire` not found for this struct
 ...
 9 |     let _ = Elements::builder().set_fire(1).set_fire(2).build();
-  |             -------------------             ^^^^^^^^ method not found in `ElementsBuilder<FireField>`
-  |             |
-  |             method `set_fire` is available on `ElementsBuilder<()>`
+  |                                             ^^^^^^^^ method not found in `ElementsBuilder<FireField>`
   |
   = note: the method was found for
           - `ElementsBuilder<()>`
