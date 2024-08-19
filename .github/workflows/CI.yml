@@ -21,7 +21,7 @@ jobs:
         with:
           components: rustfmt
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run fmt check
         run: cargo +nightly fmt --all --check
   sanity:
@@ -33,7 +33,7 @@ jobs:
         with:
           components: clippy
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run clippy check
         run: cargo clippy -- -D warnings
       - name: Install cargo audit
@@ -51,7 +51,7 @@ jobs:
         with:
           components: clippy
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Run cargo test
         run: cargo test
   publishable:
@@ -62,7 +62,7 @@ jobs:
       - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: "Dry run: buco_derive"
         run: cargo publish --dry-run
         working-directory: buco_derive
