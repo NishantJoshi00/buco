@@ -1,0 +1,66 @@
+name: CI checks
+
+on:
+  push:
+    branches: [ "main" ]
+    paths-ignore: [ "**.md" ]
+  pull_request:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+
+  formatting:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@nightly
+        with:
+          components: rustfmt
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run fmt check
+        run: cargo +nightly fmt --all --check
+  sanity:
+    name: Sanity Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run clippy check
+        run: cargo clippy -- -D warnings
+      - name: Install cargo audit
+        run: cargo install cargo-audit
+      - name: Run cargo audit
+        run: cargo audit -D warnings
+
+  tests:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: clippy
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Run cargo test
+        run: cargo test
+  publishable:
+    name: (Optional) Ready for publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Publish Dry run
+        run: cargo publish --dry-run
+
