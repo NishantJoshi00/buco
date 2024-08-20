@@ -1,0 +1,59 @@
+name: Publish Crate
+
+# manually triggered
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build_derive:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Dry run
+        run: cargo publish --dry-run
+        working-directory: buco_derive
+  publish_derive:
+    runs-on: ubuntu-latest
+    needs: [build_derive]
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Publish
+        run: cargo publish --token #{{ secrets.publish_token }}
+        working-directory: buco_derive
+  build:
+    runs-on: ubuntu-latest
+    needs: [publish_derive]
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Dry run
+        run: cargo publish --dry-run
+  publish:
+    runs-on: ubuntu-latest
+    needs: [build]
+    steps:
+      - uses: actions/checkout@v4
+        name: Checkout
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+      - name: Publish
+        run: cargo publish --token #{{ secrets.publish_token }}
+
+
